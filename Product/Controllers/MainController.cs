@@ -9,26 +9,32 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Polly;
+using Microsoft.AspNetCore.Authorization;
+
 namespace Product.Controllers
 {
+    [Route("")]
+    [ApiController]
+    [Authorize(Policy = "Staff")]
     public class MainController : Controller
     {
         private readonly ICustomerRepository _customerRepository;
         private readonly IStockRepository _stockRepository;
         private readonly ILogger<MainController> _logger;
 
-        public MainController(ICustomerRepository customerRepository, IStockRepository stockRepository, ILogger<MainController> logger)
+        public MainController( ICustomerRepository customerRepository, IStockRepository stockRepository, ILogger<MainController> logger)
         {
             _customerRepository = customerRepository;
             _stockRepository = stockRepository;
             _logger = logger;
         }
 
+
         public async Task<IActionResult> GetStock()
         {
             try
             {
-                Console.WriteLine("Try to get all stocks");
+                //Trying to get all stocks
                 var stock = await Policy
                     .Handle<Exception>()
                     .RetryAsync(2)
@@ -49,7 +55,8 @@ namespace Product.Controllers
         {
             try
             {
-                Console.WriteLine("Try to get stock by its product ID " + productID);
+                //Attempting to get stock by its product ID
+
                 var stock = await Policy
                     .Handle<Exception>()
                     .RetryAsync(2)
@@ -82,7 +89,7 @@ namespace Product.Controllers
                     return BadRequest();
 
                 }
-                Console.WriteLine("Getting stock by stock level");
+               _logger.LogInformation("Getting stock by stock level");
 
                 var stock = await Policy
                     .Handle<Exception>()
@@ -105,8 +112,7 @@ namespace Product.Controllers
             try
             {
 
-                Console.WriteLine("Trying to get resell price of stock with their product ID");
-
+               //Attempting to get resell price of stock with their product ID
                 var stock = await Policy
                     .Handle<Exception>()
                     .RetryAsync(2)
@@ -190,7 +196,7 @@ namespace Product.Controllers
                     .ConfigureAwait(false);
                 if (stock == null)
                 {
-                    Console.WriteLine("Stock having product ID" + ObjStock.ProductID + "not found.");
+                    _logger.LogInformation($"Stock having product ID {ObjStock.ProductID} not found.");
                     return NotFound();
                 }
 
@@ -230,9 +236,84 @@ namespace Product.Controllers
             }
         }
 
-///////////////////////////////////////////////////// Customer Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+        #region 2
 
+        ///////////////////////////////////////////////////// Customer Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+        public async Task<IActionResult> GetCustomers()
+        {
+            try
+            {
+                //Trying to get all the customers
+                var getCustomers = await Policy.Handle<Exception>()
+                    .RetryAsync(2).ExecuteAsync(async () => await _customerRepository.GetCustomers(/*HttpToken*/))
+                    .ConfigureAwait(false);
+                _logger.LogInformation($"Getting {getCustomers.Count} customers");
+                return Ok(getCustomers);
+            } catch (Exception ex)
+            {
+                _logger.LogInformation($"Error message {ex.Message} \n Stack trace {ex.StackTrace}");
+                return StatusCode(500);
+            }
+        }
+
+        public async Task<IActionResult> GetCustomerByID(Guid customerID)
+        {
+            try
+            {
+                //Trying to get customers woth their ID.
+                var getCustomer = await Policy
+                    .Handle<Exception>()
+                    .RetryAsync(2)
+                    .ExecuteAsync(async () => await _customerRepository.GetCustomerByID(customerID))
+                    .ConfigureAwait(false);
+
+                if (getCustomer == null)
+                {
+                    _logger.LogInformation($"The customer id {customerID}, not found");
+                    return NotFound();
+                }
+                //returning customer with ID
+                return Ok(getCustomer);
+            } catch (Exception ex)
+            {
+                _logger.LogInformation($"Error message {ex.Message} \n Stack trace {ex.StackTrace}");
+                return StatusCode(500);
+            }
+        }
+
+        public async Task<IActionResult> SetPurchaseProductAbility ([Bind("customerID, purchaseAbility")]Customer objCustomer)
+        {
+            try
+            {
+                if(!ModelState.IsValid)
+                {
+                    Console.WriteLine("Invalid object of customer was constructed");
+                    return NoContent();
+                }
+                //Trying to set purchase ability of customer.
+                var getCustomer = await Policy
+                    .Handle<Exception>()
+                    .RetryAsync(2)
+                    .ExecuteAsync(async () => await _customerRepository.SetPurchaseProductAbility(objCustomer.CustomerID, objCustomer.PurchaseAbility))
+                    .ConfigureAwait(false);
+
+                if (getCustomer == null)
+                {
+                    _logger.LogInformation($"The customer id {objCustomer.CustomerID}, not found");
+                    return NotFound();
+                }
+                _logger.LogInformation($"Returns customer with ID{objCustomer.CustomerID} and its purchase product ability{objCustomer.PurchaseAbility}.");
+                return Ok(getCustomer);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Error message {ex.Message} \n Stack trace {ex.StackTrace}");
+                return StatusCode(500);
+            }
+        }
+
+        #endregion 2
     }
 
 
