@@ -11,7 +11,6 @@ namespace Product.Models
         public string Address { get; set; }
         public string Postcode { get; set; }
         public string MobNumber { get; set; }
-        public DateTime DateOfBirth { get; set; }
         public bool PurchaseAbility { get; set;  }
 
     }

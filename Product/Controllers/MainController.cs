@@ -29,7 +29,7 @@ namespace Product.Controllers
             _logger = logger;
         }
 
-
+        #region 1
         public async Task<IActionResult> GetStock()
         {
             try
@@ -89,8 +89,8 @@ namespace Product.Controllers
                     return BadRequest();
 
                 }
-               _logger.LogInformation("Getting stock by stock level");
-
+               
+                //Getting stock by stock level
                 var stock = await Policy
                     .Handle<Exception>()
                     .RetryAsync(2)
@@ -235,6 +235,7 @@ namespace Product.Controllers
                 return StatusCode(500, "Server error");
             }
         }
+        #endregion 1
 
         #region 2
 
@@ -245,6 +246,8 @@ namespace Product.Controllers
             try
             {
                 //Trying to get all the customers
+                //for intregation do:
+                //var httpToken = HttpContext.Request.Headers[" "].ToString();
                 var getCustomers = await Policy.Handle<Exception>()
                     .RetryAsync(2).ExecuteAsync(async () => await _customerRepository.GetCustomers(/*HttpToken*/))
                     .ConfigureAwait(false);
@@ -315,8 +318,6 @@ namespace Product.Controllers
 
         #endregion 2
     }
-
-
 
 }
 
