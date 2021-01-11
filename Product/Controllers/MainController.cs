@@ -9,11 +9,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Polly;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Product.Controllers
 {
-    [Route("api")]
+    [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "Staff")]
     public class MainController : Controller
     {
         private readonly ICustomerService _customerRepository;
@@ -27,7 +29,7 @@ namespace Product.Controllers
             _logger = logger;
         }
 
-        #region 1
+        #region Internal Service Methods
         //api/Main/GetStock
         public async Task<IActionResult> GetStock()
         {
@@ -208,9 +210,9 @@ namespace Product.Controllers
                 return StatusCode(500, "Server error");
             }
         }
-        #endregion 1
+        #endregion Internal Service Methods
 
-        #region Customer Methods
+        #region External Service Methods
         ///////////////////////////////////////////////////// Customer Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         //api/Main/GetCustomers
@@ -284,7 +286,7 @@ namespace Product.Controllers
             }
         }
 
-        #endregion 2
+        #endregion External Service Methods
     }
 
 }

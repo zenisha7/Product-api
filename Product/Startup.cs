@@ -15,12 +15,14 @@ namespace Product
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
+
         }
         public IConfiguration Configuration { get; }
-        private IWebHostEnvironment Environment;
+        private IHostingEnvironment Environment;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -37,8 +39,13 @@ namespace Product
                 var cs = Configuration.GetConnectionString("ProductDBConnection");
                 options.UseSqlServer(cs);
             });
+
             services.AddScoped<IStockService, StockServices>();
             services.AddScoped<ICustomerService, CustomerServices>();
+            // Configure your policies
+            services.AddAuthorization(options =>
+                  options.AddPolicy("Staff",
+                  policy => policy.RequireClaim("role", "Staff", "Admin")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
