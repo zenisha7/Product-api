@@ -9,12 +9,12 @@ using System.Linq;
 
 namespace Product.Services
 {
-    public class StockRepository : IStockRepository
+    public class StockServices : IStockService
     {
         private readonly ProductDbContext _dbcontext;
-        private readonly ILogger<StockRepository> _logger;
+        private readonly ILogger<StockServices> _logger;
 
-        public StockRepository(ProductDbContext dbContext, ILogger<StockRepository> logger)
+        public StockServices(ProductDbContext dbContext, ILogger<StockServices> logger)
         {
             _dbcontext = dbContext;
             _logger = logger;

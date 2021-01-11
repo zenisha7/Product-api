@@ -5,7 +5,7 @@ using Product.Models;
 
 namespace Product.Services
 {
-    public interface ICustomerRepository
+    public interface ICustomerService
     {
         Task<List<Customer>> GetCustomers();
         Task<Customer> GetCustomerByID(Guid id);

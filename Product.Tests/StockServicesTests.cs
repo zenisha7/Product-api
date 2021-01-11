@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Product.Tests
 {
-    public class StockRepositoryTests
+    public class StockServicesTests
     {
-        private IStockRepository _stockRepo;
-        private Mock<ILogger<StockRepository>> _logger;
+        private IStockService _stockRepo;
+        private Mock<ILogger<StockServices>> _logger;
         private Guid productID;
         private int stockLvl;
         private double resellPrice;
@@ -22,24 +22,26 @@ namespace Product.Tests
         {
             var options = new DbContextOptionsBuilder<ProductDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             var context = new ProductDbContext(options);
-            MockStockRepository._stock.ForEach(g => context.Stocks.Add(g));
+            FakeStockRepo._stock.ForEach(g => context.Stocks.Add(g));
             context.SaveChanges();
             return context;
         }
         [SetUp] 
         public void Setup()
         {
-            _logger = new Mock<ILogger<StockRepository>>();
-            _stockRepo = new StockRepository(GetProductDbContext(), _logger.Object);
-            productID = MockStockRepository._stock[1].ProductID;
-            stockLvl = MockStockRepository._stock[1].StockLvl;
-            resellPrice = MockStockRepository._stock[1].ResellPrice;
+            _logger = new Mock<ILogger<StockServices>>();
+            _stockRepo = new StockServices(GetProductDbContext(), _logger.Object);
+            productID = FakeStockRepo._stock[1].ProductID;
+            stockLvl = 30;
+            resellPrice = FakeStockRepo._stock[1].ResellPrice;
         }
 
+      
+        #region GetStockTest
         [Test]
-        public async Task GetStock()
+        public async Task GetStockTest()
         {
-            var expectedResult = MockStockRepository._stock;
+            var expectedResult = FakeStockRepo._stock;
             var actualResult = await _stockRepo.GetStock();
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<Stock>>(actualResult);
@@ -51,12 +53,14 @@ namespace Product.Tests
                 Assert.AreEqual(expectedResult[i].StockLvl, actualResult[i].StockLvl);
             }
         }
+        #endregion GetStockTest
 
+        #region GetStockByIDTest
         //Test for get stock by its product ID
         [Test]
-        public async Task GetStockByID()
+        public async Task GetStockByIDTest()
         {
-            var expectedResult = MockStockRepository._stock[1];
+            var expectedResult = FakeStockRepo._stock[1];
             var actualResult = await _stockRepo.GetStockByProductID(expectedResult.ProductID);
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<Stock>(actualResult);
@@ -66,41 +70,48 @@ namespace Product.Tests
             Assert.AreEqual(expectedResult.ResellPrice, actualResult.ResellPrice);
 
         }
+        #endregion GetStockByIDTest
 
+        #region GetStockByLvlTest
         //Getting stock by stock level
         [Test]
-        public async Task GetStockByLvl()
+        public async Task GetStockByLvlTest()
         {
-            var expectedResult = MockStockRepository.GetStockByStockLevel(stockLvl);
+            var expectedResult = FakeStockRepo.GetStockByStockLevel(stockLvl);
             var actualResult = await _stockRepo.GetStockByStockLvl(stockLvl);
             Assert.IsNotNull(actualResult);
-            Assert.IsInstanceOf<Stock>(actualResult);
+            Assert.IsInstanceOf<List<Stock>>(actualResult);
             for(int i = 0; i < actualResult.Count; i++)
             {
                 Assert.AreEqual(expectedResult[i].ID, actualResult[i].ID);
                 Assert.AreEqual(expectedResult[i].ProductID, actualResult[i].ProductID);
-                Assert.AreEqual(expectedResult[i].StockLvl, actualResult[i].StockLvl);
                 Assert.AreEqual(expectedResult[i].ResellPrice, actualResult[i].ResellPrice);
+                Assert.AreEqual(expectedResult[i].StockLvl, actualResult[i].StockLvl);
+                
             }
         }
+        #endregion GetStockByLvlTest
 
+        #region GetResellPriceTest
         //Test for getting the resell price of stock.
         [Test]
-        public async Task GetResellPrice()
+        public async Task GetResellPriceTest()
         {
-            var expectedResult = MockStockRepository._resellPrice[1];
+            var expectedResult = FakeStockRepo._resellPrice[1];
             var actualResult = await _stockRepo.GetStockResellPrice(expectedResult.ProductID);
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<ResellPrice>(actualResult);
             Assert.AreEqual(expectedResult.ProductID, actualResult.ProductID);
             Assert.AreEqual(expectedResult.ResellPrices, actualResult.ResellPrices);
         }
+        #endregion GetResellPriceTest
 
+        #region GetResellHistoryTest
         //Test for getting the resell history of stock.
         [Test]
-        public async Task GetResellHistory()
+        public async Task GetResellHistoryTest()
         {
-            var expectedResult = MockStockRepository.GetResellHistory(productID);
+            var expectedResult = FakeStockRepo.GetResellHistory(productID);
             var actualResult = await _stockRepo.GetResellHistory(productID);
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<ResellHistory>>(actualResult);
@@ -113,12 +124,14 @@ namespace Product.Tests
 
             }
         }
+        #endregion GetResellHistoryTest
 
+        #region SetStockLvlTest
         //Test for setting the stock level of stock.
         [Test]
-        public async Task SetStockLvl()
+        public async Task SetStockLvlTest()
         {
-            var expectedResult = MockStockRepository._stock[1];
+            var expectedResult = FakeStockRepo._stock[1];
             var actualResult = await _stockRepo.SetStockLvl(expectedResult.ProductID, expectedResult.StockLvl);
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<Stock>(actualResult);
@@ -128,11 +141,6 @@ namespace Product.Tests
             Assert.AreEqual(expectedResult.StockLvl, actualResult.StockLvl);
 
         }
-
-        
-
-
-
-
+# endregion SetStockLvlTest
     }
 }

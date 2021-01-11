@@ -1,45 +1,48 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Product.Data;
 using Product.Services;
-using System;
+
 
 namespace Product
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            Environment = environment; 
         }
         public IConfiguration Configuration { get; }
-        private IWebHostEnvironment Environment { get; }
+        private IWebHostEnvironment Environment;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
             services.AddControllersWithViews();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-            services.AddDbContext<ProductDbContext>(options => options.UseSqlServer(
-                Configuration.GetConnectionString("ProductDBConnection"), optionsBuilder =>
-                {
-                        // Can enable retry pattern on EF SQL connections
-                        optionsBuilder.EnableRetryOnFailure(3, TimeSpan.FromSeconds(10), null);
-                }
-            ));
-            services.AddScoped<IStockRepository, StockRepository>();
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddDbContext<ProductDbContext>(options =>
+            {
+                var cs = Configuration.GetConnectionString("ProductDBConnection");
+                options.UseSqlServer(cs);
+            });
+            services.AddScoped<IStockService, StockServices>();
+            services.AddScoped<ICustomerService, CustomerServices>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -50,15 +53,13 @@ namespace Product
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseCookiePolicy();
             app.UseRouting();
-            app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
+
+            app.UseEndpoints(routes =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                routes.MapControllerRoute("default","{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

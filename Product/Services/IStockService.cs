@@ -6,7 +6,7 @@ using Product.Models;
 
 namespace Product.Services
 {
-    public interface IStockRepository
+    public interface IStockService
     {
         Task<List<Stock>> GetStock(); //Gets all the stock in a list
         Task<Stock> GetStockByProductID(Guid productID); //Get stocks by their product Id.

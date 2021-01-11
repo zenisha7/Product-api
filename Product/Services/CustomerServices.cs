@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Product.Services
 {
-    public class CustomerRepository : ICustomerRepository
+    public class CustomerServices : ICustomerService
     {
-        private readonly ILogger<CustomerRepository> _logger;
+        private readonly ILogger<CustomerServices> _logger;
         private readonly List<Customer> _customers;
 
-        public CustomerRepository(ILogger<CustomerRepository> logger)
+        public CustomerServices(ILogger<CustomerServices> logger)
         {
-            _customers = MockCustomerRepository._customers;
+            _customers = FakeCustomerRepo._customers;
             _logger = logger;
         }
 

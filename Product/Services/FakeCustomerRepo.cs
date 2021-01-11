@@ -6,7 +6,7 @@ using Product.Models;
 
 namespace Product.Services
 {
-    public class MockCustomerRepository
+    public class FakeCustomerRepo
     {
         public static readonly List<Customer> _customers = new List<Customer>
         {

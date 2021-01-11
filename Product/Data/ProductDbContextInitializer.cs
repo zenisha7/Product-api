@@ -7,11 +7,11 @@ namespace Product.Data
 {
     public static class ProductDbContextInitializer
     {
-        public static async Task SeedData(ProductDbContext context, IServiceProvider serviceProvider)
+        public static async Task TestData(ProductDbContext context, IServiceProvider serviceProvider)
         {
             if (context.Stocks.Any() && context.ResellHistories.Any())
             {
-                return;
+                return; //seems seeded
 
             }
 

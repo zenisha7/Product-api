@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Product.Models;
 using System;
 
@@ -7,13 +8,13 @@ namespace Product.Data
 {
     public class ProductDbContext: DbContext
     {
+       
+        public DbSet<Stock> Stocks { get; set; }
+        public DbSet<ResellHistory> ResellHistories { get; set; }
         public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
         {
+            
         }
-
-        public DbSet<Stock> Stocks{ get; set; }
-        public DbSet<ResellHistory> ResellHistories { get; set; }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);

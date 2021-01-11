@@ -6,21 +6,21 @@ using Product.Models;
 
 namespace Product.Services
 {
-    public class MockStockRepository
+    public class FakeStockRepo
     {
         public static readonly List<Stock> _stock = new List<Stock>
         {
-            new Stock{ID = new Guid("68cb71f9-93e4-41ed-99b4-0e0c805585d0"),
+            new Stock{ID = new Guid(),
                 ProductID = new Guid("db231658-e8ee-4b33-8c78-9abd30fa0e76"),
                 StockLvl = 123,
                 ResellPrice = 100.50,
             },
-            new Stock {ID = new Guid("6de2ebdc-d39a-4f12-b7d9-44453833bfee"),
+            new Stock {ID = new Guid(),
                 ProductID = new Guid("d9f17828-d2d4-47a7-b9f7-f3da369ef321"),
                 StockLvl = 456,
                 ResellPrice = 200.50,
             },
-            new Stock {ID = new Guid("36004789-ebe9-47f9-a45c-6502232e5304"),
+            new Stock {ID = new Guid(),
                 ProductID = new Guid("9ba76f81-ad1e-47ec-825c-a43fcdf027bc"),
                 StockLvl = 789,
                 ResellPrice = 300.50,

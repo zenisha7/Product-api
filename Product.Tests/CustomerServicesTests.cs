@@ -8,25 +8,25 @@ using System.Threading.Tasks;
 
 namespace Product.Tests
 {
-    public class CustomerRepositoryTests
+    public class CustomerServicesTests
     {
-        private ICustomerRepository _customerRepo;
-        private Mock<ILogger<CustomerRepository>> _logger;
+        private ICustomerService _customerRepo;
+        private Mock<ILogger<CustomerServices>> _logger;
 
 
         [SetUp]
         public void Setup()
         {
-            _logger = new Mock<ILogger<CustomerRepository>>();
-            _customerRepo = new CustomerRepository(_logger.Object);
+            _logger = new Mock<ILogger<CustomerServices>>();
+            _customerRepo = new CustomerServices(_logger.Object);
 
         }
 
-        #region GetCustomers
+        #region GetCustomersTest
         [Test]
-        public async Task GetCustomers()
+        public async Task GetCustomersTest()
         {
-            var expectedResult = MockCustomerRepository._customers;
+            var expectedResult = FakeCustomerRepo._customers;
             var actualResult = await _customerRepo.GetCustomers();
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<Customer>>(actualResult);
@@ -43,13 +43,13 @@ namespace Product.Tests
                 Assert.AreEqual(expectedResult[i].PurchaseAbility, actualResult[i].PurchaseAbility);
             }
         }
-        #endregion GetCustomers
+        #endregion GetCustomersTest
 
-        #region GetCustomerByID
+        #region GetCustomerByIDTest
         [Test]
-        public async Task GetCustomerWithID()
+        public async Task GetCustomerByIDTest()
         {
-            var expectedResult = MockCustomerRepository._customers[1];
+            var expectedResult = FakeCustomerRepo._customers[1];
             var actualResult = await _customerRepo.GetCustomerByID(expectedResult.CustomerID);
 
             Assert.IsNotNull(actualResult);
@@ -63,13 +63,13 @@ namespace Product.Tests
             Assert.AreEqual(expectedResult.MobNumber, actualResult.MobNumber);
             Assert.AreEqual(expectedResult.PurchaseAbility, actualResult.PurchaseAbility);
         }
-        #endregion GetCustomerByID
-        
-        #region SetPurchaseProductAbility
+        #endregion GetCustomerByIDTest
+
+        #region SetPurchaseProductAbilityTest
         [Test]
-        public async Task SetPurchaseProductAbility()
+        public async Task SetPurchaseProductAbilityTest()
         {
-            var expectedResult = MockCustomerRepository._customers[1];
+            var expectedResult = FakeCustomerRepo._customers[1];
             var actualResult = await _customerRepo.SetPurchaseProductAbility(expectedResult.CustomerID, expectedResult.PurchaseAbility);
 
             Assert.IsNotNull(actualResult);
@@ -83,7 +83,7 @@ namespace Product.Tests
             Assert.AreEqual(expectedResult.MobNumber, actualResult.MobNumber);
             Assert.AreEqual(expectedResult.PurchaseAbility, actualResult.PurchaseAbility);
         }
-        #endregion SetPurchaseProductAbility
+        #endregion SetPurchaseProductAbilityTest
 
     }
 }
