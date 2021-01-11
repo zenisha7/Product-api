@@ -30,6 +30,7 @@ namespace Product.Controllers
         }
 
         #region Internal Service Methods
+        [HttpGet("api/Main/GetStock")]
         //api/Main/GetStock
         public async Task<IActionResult> GetStock()
         {

@@ -6,7 +6,7 @@ using Product.Models;
 
 namespace Product.Services
 {
-    public class FakeStockRepo
+    public class FakeStockService
     {
         public static readonly List<Stock> _stock = new List<Stock>
         {

@@ -35,10 +35,10 @@ namespace Product.Tests
             _customerRepo = new Mock<ICustomerService>();
             _logger = new Mock<ILogger<MainController>>();
             _mainController = new MainController( _customerRepo.Object, _stockRepo.Object, _logger.Object);
-            stocks = FakeStockRepo._stock;
-            customers = FakeCustomerRepo._customers;
-            _resellPrice = FakeStockRepo._resellPrice;
-            _resellHistory = FakeStockRepo._resellHistory;
+            stocks = FakeStockService._stock;
+            customers = FakeCustomerService._customers;
+            _resellPrice = FakeStockService._resellPrice;
+            _resellHistory = FakeStockService._resellHistory;
         }
 
         #region GetStockTest

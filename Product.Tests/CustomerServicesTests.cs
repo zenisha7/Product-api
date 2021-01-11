@@ -26,7 +26,7 @@ namespace Product.Tests
         [Test]
         public async Task GetCustomersTest()
         {
-            var expectedResult = FakeCustomerRepo._customers;
+            var expectedResult = FakeCustomerService._customers;
             var actualResult = await _customerRepo.GetCustomers();
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<Customer>>(actualResult);
@@ -49,7 +49,7 @@ namespace Product.Tests
         [Test]
         public async Task GetCustomerByIDTest()
         {
-            var expectedResult = FakeCustomerRepo._customers[1];
+            var expectedResult = FakeCustomerService._customers[1];
             var actualResult = await _customerRepo.GetCustomerByID(expectedResult.CustomerID);
 
             Assert.IsNotNull(actualResult);
@@ -69,7 +69,7 @@ namespace Product.Tests
         [Test]
         public async Task SetPurchaseProductAbilityTest()
         {
-            var expectedResult = FakeCustomerRepo._customers[1];
+            var expectedResult = FakeCustomerService._customers[1];
             var actualResult = await _customerRepo.SetPurchaseProductAbility(expectedResult.CustomerID, expectedResult.PurchaseAbility);
 
             Assert.IsNotNull(actualResult);

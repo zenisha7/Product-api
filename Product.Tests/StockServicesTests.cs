@@ -22,7 +22,7 @@ namespace Product.Tests
         {
             var options = new DbContextOptionsBuilder<ProductDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             var context = new ProductDbContext(options);
-            FakeStockRepo._stock.ForEach(g => context.Stocks.Add(g));
+            FakeStockService._stock.ForEach(g => context.Stocks.Add(g));
             context.SaveChanges();
             return context;
         }
@@ -31,9 +31,9 @@ namespace Product.Tests
         {
             _logger = new Mock<ILogger<StockServices>>();
             _stockRepo = new StockServices(GetProductDbContext(), _logger.Object);
-            productID = FakeStockRepo._stock[1].ProductID;
+            productID = FakeStockService._stock[1].ProductID;
             stockLvl = 30;
-            resellPrice = FakeStockRepo._stock[1].ResellPrice;
+            resellPrice = FakeStockService._stock[1].ResellPrice;
         }
 
       
@@ -41,7 +41,7 @@ namespace Product.Tests
         [Test]
         public async Task GetStockTest()
         {
-            var expectedResult = FakeStockRepo._stock;
+            var expectedResult = FakeStockService._stock;
             var actualResult = await _stockRepo.GetStock();
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<Stock>>(actualResult);
@@ -60,7 +60,7 @@ namespace Product.Tests
         [Test]
         public async Task GetStockByIDTest()
         {
-            var expectedResult = FakeStockRepo._stock[1];
+            var expectedResult = FakeStockService._stock[1];
             var actualResult = await _stockRepo.GetStockByProductID(expectedResult.ProductID);
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<Stock>(actualResult);
@@ -77,7 +77,7 @@ namespace Product.Tests
         [Test]
         public async Task GetStockByLvlTest()
         {
-            var expectedResult = FakeStockRepo.GetStockByStockLevel(stockLvl);
+            var expectedResult = FakeStockService.GetStockByStockLevel(stockLvl);
             var actualResult = await _stockRepo.GetStockByStockLvl(stockLvl);
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<Stock>>(actualResult);
@@ -97,7 +97,7 @@ namespace Product.Tests
         [Test]
         public async Task GetResellPriceTest()
         {
-            var expectedResult = FakeStockRepo._resellPrice[1];
+            var expectedResult = FakeStockService._resellPrice[1];
             var actualResult = await _stockRepo.GetStockResellPrice(expectedResult.ProductID);
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<ResellPrice>(actualResult);
@@ -111,7 +111,7 @@ namespace Product.Tests
         [Test]
         public async Task GetResellHistoryTest()
         {
-            var expectedResult = FakeStockRepo.GetResellHistory(productID);
+            var expectedResult = FakeStockService.GetResellHistory(productID);
             var actualResult = await _stockRepo.GetResellHistory(productID);
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<ResellHistory>>(actualResult);
@@ -131,7 +131,7 @@ namespace Product.Tests
         [Test]
         public async Task SetStockLvlTest()
         {
-            var expectedResult = FakeStockRepo._stock[1];
+            var expectedResult = FakeStockService._stock[1];
             var actualResult = await _stockRepo.SetStockLvl(expectedResult.ProductID, expectedResult.StockLvl);
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<Stock>(actualResult);

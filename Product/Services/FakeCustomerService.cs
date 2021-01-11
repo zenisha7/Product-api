@@ -6,7 +6,7 @@ using Product.Models;
 
 namespace Product.Services
 {
-    public class FakeCustomerRepo
+    public class FakeCustomerService
     {
         public static readonly List<Customer> _customers = new List<Customer>
         {
@@ -27,8 +27,6 @@ namespace Product.Services
                 Postcode = "NG7",
                 MobNumber = "2222222",
                 PurchaseAbility = true
-                
-                
             },
             new Customer {CustomerID = new Guid("d9f17828-d2d4-47a7-b9f7-f3da369ef321"),
                 FirstName = "Customer",

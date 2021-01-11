@@ -62,6 +62,7 @@ namespace Product
             }
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseAuthentication();
             app.UseRouting();
 
             app.UseEndpoints(routes =>

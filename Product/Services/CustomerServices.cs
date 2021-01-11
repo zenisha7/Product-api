@@ -14,7 +14,7 @@ namespace Product.Services
 
         public CustomerServices(ILogger<CustomerServices> logger)
         {
-            _customers = FakeCustomerRepo._customers;
+            _customers = FakeCustomerService._customers;
             _logger = logger;
         }
 
