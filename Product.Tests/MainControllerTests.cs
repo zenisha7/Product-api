@@ -14,14 +14,14 @@ namespace Product.Tests
     public class MainControllerTests
     {
         private int stockLvl;
-        private Stock objStock;
-        private Customer objCustomer;
-        private Mock<IStockService> _stockRepo;
+        private ProductDto objStock;
+        private CustomerDto objCustomer;
+        private Mock<IProductService> _stockRepo;
         private Mock<ICustomerService> _customerRepo;
         private Mock<ILogger<MainController>> _logger;
         private MainController _mainController;
-        private List<Stock> stocks;
-        private List<Customer> customers;
+        private List<ProductDto> stocks;
+        private List<CustomerDto> customers;
         private List<ResellPrice> _resellPrice;
         private List<ResellHistory> _resellHistory;
 
@@ -29,26 +29,26 @@ namespace Product.Tests
         public void Setup()
         {
             stockLvl = 20;
-            objStock = new Stock();
-            objCustomer = new Customer();
-            _stockRepo = new Mock<IStockService>();
+            objStock = new ProductDto();
+            objCustomer = new CustomerDto();
+            _stockRepo = new Mock<IProductService>();
             _customerRepo = new Mock<ICustomerService>();
             _logger = new Mock<ILogger<MainController>>();
             _mainController = new MainController( _customerRepo.Object, _stockRepo.Object, _logger.Object);
-            stocks = FakeStockService._stock;
+            stocks = FakeProductService._product;
             customers = FakeCustomerService._customers;
-            _resellPrice = FakeStockService._resellPrice;
-            _resellHistory = FakeStockService._resellHistory;
+            _resellPrice = FakeProductService._resellPrice;
+            _resellHistory = FakeProductService._resellHistory;
         }
 
         #region GetStockTest
         [Test]
         public async Task GetStockTest()
         {
-            _stockRepo.Setup(g => g.GetStock()).ReturnsAsync(stocks).Verifiable();
-            var actualResult = await _mainController.GetStock();
+            _stockRepo.Setup(g => g.GetAllProducts()).ReturnsAsync(stocks).Verifiable();
+            var actualResult = await _mainController.GetAllProducts();
             var okResult = actualResult as OkObjectResult;
-            var okStockResult = okResult.Value as IEnumerable<Stock>;
+            var okStockResult = okResult.Value as IEnumerable<ProductDto>;
             var okStockResultList = okStockResult.ToList();
 
             Assert.IsNotNull(actualResult);
@@ -64,7 +64,7 @@ namespace Product.Tests
                 Assert.AreEqual(stocks[i].ResellPrice, okStockResultList[i].ResellPrice);
             }
             _stockRepo.Verify();
-            _stockRepo.Verify(g => g.GetStock(), Times.Once); //Times: num of times method expected to call
+            _stockRepo.Verify(g => g.GetAllProducts(), Times.Once); //Times: num of times method expected to call
         }
         #endregion GetStockTest
 
@@ -73,10 +73,10 @@ namespace Product.Tests
         public async Task GetStockByProductIDTest()
         {
             var expectedResult = stocks[1];
-            _stockRepo.Setup(g => g.GetStockByProductID(expectedResult.ProductID)).ReturnsAsync(expectedResult).Verifiable();
-            var actualResult = await _mainController.GetStockByProductID(expectedResult.ProductID);
+            _stockRepo.Setup(g => g.GetProductByProductID(expectedResult.ProductID)).ReturnsAsync(expectedResult).Verifiable();
+            var actualResult = await _mainController.GetProductByProductID(expectedResult.ProductID);
             var okResult = actualResult as OkObjectResult;
-            var okStockResult = okResult.Value as Stock;
+            var okStockResult = okResult.Value as ProductDto;
 
             Assert.IsNotNull(actualResult);
             Assert.IsNotNull(okResult);
@@ -87,7 +87,7 @@ namespace Product.Tests
             Assert.AreEqual(expectedResult.StockLvl, okStockResult.StockLvl);
             Assert.AreEqual(expectedResult.ResellPrice, okStockResult.ResellPrice);
             _stockRepo.Verify();
-            _stockRepo.Verify(g => g.GetStockByProductID(expectedResult.ProductID), Times.Once); 
+            _stockRepo.Verify(g => g.GetProductByProductID(expectedResult.ProductID), Times.Once); 
         }
         #endregion GetStockByProductIDTest
 
@@ -95,10 +95,10 @@ namespace Product.Tests
         [Test]
         public async Task GetStockByLvlTest()
         {
-            _stockRepo.Setup(g => g.GetStockByStockLvl(stockLvl)).ReturnsAsync(stocks).Verifiable();
-            var actualResult = await _mainController.GetStockByStockLvl(stockLvl);
+            _stockRepo.Setup(g => g.GetStockLvlOfProducts(stockLvl)).ReturnsAsync(stocks).Verifiable();
+            var actualResult = await _mainController.GetStockLvlOfProducts(stockLvl);
             var okResult = actualResult as OkObjectResult;
-            var okStockResult = okResult.Value as IEnumerable<Stock>;
+            var okStockResult = okResult.Value as IEnumerable<ProductDto>;
             var okStockResultList = okStockResult.ToList();
 
             Assert.IsNotNull(actualResult);
@@ -114,7 +114,7 @@ namespace Product.Tests
                 Assert.AreEqual(stocks[i].ResellPrice, okStockResultList[i].ResellPrice);
             }
             _stockRepo.Verify();
-            _stockRepo.Verify(g => g.GetStockByStockLvl(stockLvl), Times.Once);
+            _stockRepo.Verify(g => g.GetStockLvlOfProducts(stockLvl), Times.Once);
         }
 
         #endregion GetStockByLvlTest
@@ -124,8 +124,8 @@ namespace Product.Tests
         public async Task GetResellPriceTest()
         {
             var expectedResult = _resellPrice[1];
-            _stockRepo.Setup(g => g.GetStockResellPrice(expectedResult.ProductID)).ReturnsAsync(expectedResult).Verifiable();
-            var actualResult = await _mainController.GetStockResellPrice(expectedResult.ProductID);
+            _stockRepo.Setup(g => g.GetResellPriceOfProducts(expectedResult.ProductID)).ReturnsAsync(expectedResult).Verifiable();
+            var actualResult = await _mainController.GetResellPriceOfProducts(expectedResult.ProductID);
             var okResult = actualResult as OkObjectResult;
             var okStockResult = okResult.Value as ResellPrice;
 
@@ -136,7 +136,7 @@ namespace Product.Tests
             Assert.AreEqual(expectedResult.ProductID, okStockResult.ProductID);
             Assert.AreEqual(expectedResult.ResellPrices, okStockResult.ResellPrices);
             _stockRepo.Verify();
-            _stockRepo.Verify(g => g.GetStockResellPrice(expectedResult.ProductID), Times.Once);
+            _stockRepo.Verify(g => g.GetResellPriceOfProducts(expectedResult.ProductID), Times.Once);
         }
         #endregion GetResellPriceTest
 
@@ -145,12 +145,12 @@ namespace Product.Tests
         public async Task SetResellPriceTest()
         {
             var expectedResult = stocks[1];
-            _stockRepo.Setup(g => g.SetStockResellPrice(expectedResult.ID, expectedResult.ResellPrice)).ReturnsAsync(expectedResult).Verifiable();
+            _stockRepo.Setup(g => g.SetResellPriceofProducts(expectedResult.ID, expectedResult.ResellPrice)).ReturnsAsync(expectedResult).Verifiable();
             objStock.ProductID = expectedResult.ID;
             objStock.ResellPrice = expectedResult.ResellPrice;
-            var actualResult = await _mainController.SetStockResellPrice(objStock);
+            var actualResult = await _mainController.SetResellPriceOfProducts(objStock);
             var okResult = actualResult as OkObjectResult;
-            var okStockResult = okResult.Value as Stock;
+            var okStockResult = okResult.Value as ProductDto;
 
             Assert.IsNotNull(actualResult);
             Assert.IsNotNull(okResult);
@@ -161,7 +161,7 @@ namespace Product.Tests
             Assert.AreEqual(expectedResult.StockLvl, okStockResult.StockLvl);
             Assert.AreEqual(expectedResult.ResellPrice, okStockResult.ResellPrice);
             _stockRepo.Verify();
-            _stockRepo.Verify(g => g.SetStockResellPrice(expectedResult.ID, expectedResult.ResellPrice), Times.Once);
+            _stockRepo.Verify(g => g.SetResellPriceofProducts(expectedResult.ID, expectedResult.ResellPrice), Times.Once);
         }
         #endregion SetResellPriceTest
 
@@ -170,12 +170,12 @@ namespace Product.Tests
         public async Task SetStockLvlTest()
         {
             var expectedResult = stocks[1];
-            _stockRepo.Setup(g => g.SetStockLvl(expectedResult.ID, expectedResult.StockLvl)).ReturnsAsync(expectedResult).Verifiable();
+            _stockRepo.Setup(g => g.SetStockLvlOfProducts(expectedResult.ID, expectedResult.StockLvl)).ReturnsAsync(expectedResult).Verifiable();
             objStock.ProductID = expectedResult.ID;
             objStock.StockLvl = expectedResult.StockLvl;
-            var actualResult = await _mainController.SetStockLvl(objStock);
+            var actualResult = await _mainController.SetStockLvlOfProducts(objStock);
             var okResult = actualResult as OkObjectResult;
-            var okStockResult = okResult.Value as Stock;
+            var okStockResult = okResult.Value as ProductDto;
 
             Assert.IsNotNull(actualResult);
             Assert.IsNotNull(okResult);
@@ -186,7 +186,7 @@ namespace Product.Tests
             Assert.AreEqual(expectedResult.StockLvl, okStockResult.StockLvl);
             Assert.AreEqual(expectedResult.ResellPrice, okStockResult.ResellPrice);
             _stockRepo.Verify();
-            _stockRepo.Verify(g => g.SetStockLvl(expectedResult.ID, expectedResult.StockLvl), Times.Once);
+            _stockRepo.Verify(g => g.SetStockLvlOfProducts(expectedResult.ID, expectedResult.StockLvl), Times.Once);
         }
         #endregion SetStockLvlTest
 
@@ -196,7 +196,7 @@ namespace Product.Tests
         {
             var expectedResult = _resellHistory;
             _stockRepo.Setup(g => g.GetResellHistory(expectedResult[1].ProductID)).ReturnsAsync(expectedResult).Verifiable();
-            var actualResult = await _mainController.GetStockResellHistory(expectedResult[1].ProductID);
+            var actualResult = await _mainController.GetResellHistory(expectedResult[1].ProductID);
             var okResult = actualResult as OkObjectResult;
             var okResellHistoryResult = okResult.Value as IEnumerable<ResellHistory>;
             var okResellHistoryResultList = okResellHistoryResult.ToList();
@@ -225,7 +225,7 @@ namespace Product.Tests
             _customerRepo.Setup(g => g.GetCustomers()).ReturnsAsync(customers).Verifiable();
             var actualResult = await _mainController.GetCustomers();
             var okResult = actualResult as OkObjectResult;
-            var okCustomerResult = okResult.Value as IEnumerable<Customer>;
+            var okCustomerResult = okResult.Value as IEnumerable<CustomerDto>;
             var okCustomerResultList = okCustomerResult.ToList();
 
             Assert.IsNotNull(actualResult);
@@ -257,7 +257,7 @@ namespace Product.Tests
             _customerRepo.Setup(g => g.GetCustomerByID(expectedResult.CustomerID)).ReturnsAsync(expectedResult).Verifiable();
             var actualResult = await _mainController.GetCustomerByID(expectedResult.CustomerID);
             var okResult = actualResult as OkObjectResult;
-            var okCustomerResult = okResult.Value as Customer;
+            var okCustomerResult = okResult.Value as CustomerDto;
 
             Assert.IsNotNull(actualResult);
             Assert.IsNotNull(okResult);
@@ -288,7 +288,7 @@ namespace Product.Tests
             objCustomer.PurchaseAbility = expectedResult.PurchaseAbility;
             var actualResult = await _mainController.SetPurchaseProductAbility(objCustomer);
             var okResult = actualResult as OkObjectResult;
-            var okCustomerResult = okResult.Value as Customer;
+            var okCustomerResult = okResult.Value as CustomerDto;
 
             Assert.IsNotNull(actualResult);
             Assert.IsNotNull(okResult);

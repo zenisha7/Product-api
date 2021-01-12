@@ -40,8 +40,8 @@ namespace Product
                 options.UseSqlServer(cs);
             });
 
-            services.AddScoped<IStockService, StockServices>();
-            services.AddScoped<ICustomerService, CustomerServices>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICustomerService, CustomerService>();
             // Configure your policies
             services.AddAuthorization(options =>
                   options.AddPolicy("Staff",

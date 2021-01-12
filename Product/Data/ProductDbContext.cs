@@ -9,7 +9,7 @@ namespace Product.Data
     public class ProductDbContext: DbContext
     {
        
-        public DbSet<Stock> Stocks { get; set; }
+        public DbSet<ProductDto> Products { get; set; }
         public DbSet<ResellHistory> ResellHistories { get; set; }
         public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
         {
@@ -23,7 +23,7 @@ namespace Product.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Stock>(x =>
+            modelBuilder.Entity<ProductDto>(x =>
             {
                 x.Property(y => y.ID).IsRequired();
                 x.Property(y => y.ProductID).IsRequired();

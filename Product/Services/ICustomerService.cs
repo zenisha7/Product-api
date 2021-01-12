@@ -7,8 +7,8 @@ namespace Product.Services
 {
     public interface ICustomerService
     {
-        Task<List<Customer>> GetCustomers();
-        Task<Customer> GetCustomerByID(Guid id);
-        Task<Customer> SetPurchaseProductAbility(Guid id, bool purchase);
+        Task<List<CustomerDto>> GetCustomers();
+        Task<CustomerDto> GetCustomerByID(Guid id);
+        Task<CustomerDto> SetPurchaseProductAbility(Guid id, bool purchase);
     }
 }

@@ -9,24 +9,24 @@ namespace Product.Data
     {
         public static async Task TestData(ProductDbContext context, IServiceProvider serviceProvider)
         {
-            if (context.Stocks.Any() && context.ResellHistories.Any())
+            if (context.Products.Any() && context.ResellHistories.Any())
             {
                 return; //seems seeded
 
             }
 
-            var getStock = new List<Models.Stock>
+            var getStock = new List<Models.ProductDto>
             {
-                new Models.Stock{ProductID = Guid.NewGuid(), StockLvl = 11, ResellPrice = 11.99},
-                new Models.Stock{ProductID = Guid.NewGuid(), StockLvl = 12, ResellPrice = 12.99},
-                new Models.Stock{ProductID = Guid.NewGuid(), StockLvl = 13, ResellPrice = 13.99},
-                new Models.Stock{ProductID = Guid.NewGuid(), StockLvl = 14, ResellPrice = 14.99},
-                new Models.Stock{ProductID = Guid.NewGuid(), StockLvl = 15, ResellPrice = 15.99},
-                new Models.Stock{ProductID = Guid.NewGuid(), StockLvl = 16, ResellPrice = 16.99},
-                new Models.Stock{ProductID = Guid.NewGuid(), StockLvl = 17, ResellPrice = 17.99},
+                new Models.ProductDto{ProductID = Guid.NewGuid(), StockLvl = 11, ResellPrice = 11.99},
+                new Models.ProductDto{ProductID = Guid.NewGuid(), StockLvl = 12, ResellPrice = 12.99},
+                new Models.ProductDto{ProductID = Guid.NewGuid(), StockLvl = 13, ResellPrice = 13.99},
+                new Models.ProductDto{ProductID = Guid.NewGuid(), StockLvl = 14, ResellPrice = 14.99},
+                new Models.ProductDto{ProductID = Guid.NewGuid(), StockLvl = 15, ResellPrice = 15.99},
+                new Models.ProductDto{ProductID = Guid.NewGuid(), StockLvl = 16, ResellPrice = 16.99},
+                new Models.ProductDto{ProductID = Guid.NewGuid(), StockLvl = 17, ResellPrice = 17.99},
 
             };
-            getStock.ForEach(g => context.Stocks.Add(g));
+            getStock.ForEach(g => context.Products.Add(g));
             var getResellHistory = new List<Models.ResellHistory>
             {
                 new Models.ResellHistory{ProductID = getStock[1].ProductID, ResellPrice = 21.99, DateTime = new DateTime(2020, 12, 21)},

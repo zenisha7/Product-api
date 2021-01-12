@@ -22,7 +22,7 @@ namespace Product.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Stocks",
+                name: "Products",
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -32,7 +32,7 @@ namespace Product.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Stocks", x => x.ID);
+                    table.PrimaryKey("PK_Products", x => x.ID);
                 });
         }
 
@@ -42,7 +42,7 @@ namespace Product.Migrations
                 name: "ResellHistories");
 
             migrationBuilder.DropTable(
-                name: "Stocks");
+                name: "Products");
         }
     }
 }

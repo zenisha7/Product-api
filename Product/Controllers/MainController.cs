@@ -18,62 +18,62 @@ namespace Product.Controllers
     [Authorize(Policy = "Staff")]
     public class MainController : Controller
     {
-        private readonly ICustomerService _customerRepository;
-        private readonly IStockService _stockRepository;
+        private readonly ICustomerService _customerService;
+        private readonly IProductService _productService;
         private readonly ILogger<MainController> _logger;
 
-        public MainController( ICustomerService customerRepository, IStockService stockRepository, ILogger<MainController> logger)
+        public MainController( ICustomerService customerService, IProductService productService, ILogger<MainController> logger)
         {
-            _customerRepository = customerRepository;
-            _stockRepository = stockRepository;
+            _customerService = customerService;
+            _productService = productService;
             _logger = logger;
         }
 
         #region Internal Service Methods
-        [HttpGet("api/Main/GetStock")]
-        //api/Main/GetStock
-        public async Task<IActionResult> GetStock()
+        [HttpGet("api/Main/GetAllProducts")]
+        //api/Main/GetAllProducts
+        public async Task<IActionResult> GetAllProducts()
         {
             try
             {
-                var getStock = await Policy.Handle<Exception>().RetryAsync(2)
-                    .ExecuteAsync(async () => await _stockRepository.GetStock())
+                var getProducts = await Policy.Handle<Exception>().RetryAsync(2)
+                    .ExecuteAsync(async () => await _productService.GetAllProducts())
                     .ConfigureAwait(false);
-                _logger.LogInformation($"Getting {getStock.Count} stock");
-                return Ok(getStock);
+                _logger.LogInformation($"Getting {getProducts.Count} product.");
+                return Ok(getProducts);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Stack trace: {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return StatusCode(500, "Server error");
             }
         }
 
-        //api/Main/GetStockByProductID
-        public async Task<IActionResult> GetStockByProductID(Guid productID)
+        //api/Main/GetProductByProductID
+        public async Task<IActionResult> GetProductByProductID(Guid productID)
         {
             try
             {
-                var getStock = await Policy.Handle<Exception>().RetryAsync(2)
-                    .ExecuteAsync(async () => await _stockRepository.GetStockByProductID(productID))
+                var getProduct = await Policy.Handle<Exception>().RetryAsync(2)
+                    .ExecuteAsync(async () => await _productService.GetProductByProductID(productID))
                     .ConfigureAwait(false);
-                if (getStock == null)
+                if (getProduct == null)
                 {
-                    _logger.LogInformation($"Stock not found. ID num: {productID} ");
+                    _logger.LogInformation($"Product not found. Product ID: {productID} ");
                     return NotFound();
                 }
-                _logger.LogInformation($"Retriving stock with product ID {getStock.ProductID} ");
-                return Ok(getStock);
+                _logger.LogInformation($"Returning product with product ID {getProduct.ProductID} ");
+                return Ok(getProduct);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Stack trace: {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return StatusCode(500, "Server error");
             }
         }
 
-        //api/Main/GetStockByStockLvl
-        public async Task<IActionResult> GetStockByStockLvl(int stockLvl)
+        //api/Main/GetStockLvlOfProducts
+        public async Task<IActionResult> GetStockLvlOfProducts(int stockLvl)
         {
             try
             {
@@ -83,131 +83,131 @@ namespace Product.Controllers
                     return BadRequest();
                 }
                 //Getting stock by stock level
-                var stock = await Policy.Handle<Exception>().RetryAsync(2)
-                    .ExecuteAsync(async () => await _stockRepository.GetStockByStockLvl(stockLvl))
+                var getProduct = await Policy.Handle<Exception>().RetryAsync(2)
+                    .ExecuteAsync(async () => await _productService.GetStockLvlOfProducts(stockLvl))
                     .ConfigureAwait(false);
-                _logger.LogInformation($"Returns stock by stock level {stockLvl}");
-                return Ok(stock);
+                _logger.LogInformation($"Returns stock level {stockLvl} of products.");
+                return Ok(getProduct);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Stack trace: {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return StatusCode(500, "Server error");
             }
         }
 
-        //api/Main/GetStockResellPrice
-        public async Task<IActionResult> GetStockResellPrice(Guid productID)
+        //api/Main/GetResellPriceOfProducts
+        public async Task<IActionResult> GetResellPriceOfProducts(Guid productID)
         {
             try
             {
-               //Getting resell price of stock with their product ID
-                var getStock = await Policy.Handle<Exception>().RetryAsync(2)
-                    .ExecuteAsync(async () => await _stockRepository.GetStockResellPrice(productID))
+               //Getting resell price of product with their product ID
+                var getProduct = await Policy.Handle<Exception>().RetryAsync(2)
+                    .ExecuteAsync(async () => await _productService.GetResellPriceOfProducts(productID))
                     .ConfigureAwait(false);
-                if (getStock == null)
+                if (getProduct == null)
                 {
                     return NotFound();
                 }
                 _logger.LogInformation($"Returns resell price of stock with {productID} as product ID.");
-                return Ok(getStock);
+                return Ok(getProduct);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Stack trace: {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return StatusCode(500, "Server error");
             }
 
         }
 
-        // api/Main/SetStockResellPrice
+        // api/Main/SetResellPriceOfProducts
         [HttpPost()]
-        public async Task<IActionResult> SetStockResellPrice([Bind("ProductID, ResellPrice")]Stock ObjStock)
+        public async Task<IActionResult> SetResellPriceOfProducts([Bind("ProductID, ResellPrice")]ProductDto objProduct)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogInformation("The constructed object of stock is not valid.");
+                    _logger.LogInformation("Invalid construction of product object.");
                     return NoContent();
                 }
-                if (ObjStock.ResellPrice < 0)
+                if (objProduct.ResellPrice < 0)
                 {
-                    _logger.LogInformation($"Resell price can not be les than 0. : {ObjStock.ResellPrice}");
+                    _logger.LogInformation($"Resell price : {objProduct.ResellPrice}, Resell price should not be less than 0");
                     return BadRequest();
                 }
-                _logger.LogInformation($"Setting {ObjStock.ResellPrice} as resell price of stock with product ID {ObjStock.ProductID}");
-                var getStock = await Policy.Handle<Exception>().RetryAsync(2)
-                    .ExecuteAsync(async () => await _stockRepository.SetStockResellPrice(ObjStock.ProductID, ObjStock.ResellPrice))
+                _logger.LogInformation($"Setting {objProduct.ResellPrice} as resell price of product with product ID {objProduct.ProductID}");
+                var getProduct = await Policy.Handle<Exception>().RetryAsync(2)
+                    .ExecuteAsync(async () => await _productService.SetResellPriceofProducts(objProduct.ProductID, objProduct.ResellPrice))
                     .ConfigureAwait(false);
-                if (getStock == null)
+                if (getProduct == null)
                 {
-                    _logger.LogInformation($"Stock not found.");
+                    _logger.LogInformation($"Product having product ID {objProduct.ProductID} not found.");
                     return NotFound();
                 }
-                _logger.LogInformation($"New resell price as {ObjStock.ResellPrice}is set for stock with product ID  {ObjStock.ProductID}");
-                return Ok(getStock);
+                _logger.LogInformation($"New resell price as {objProduct.ResellPrice}is set for product with product ID  {objProduct.ProductID}");
+                return Ok(getProduct);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Stack trace: {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return StatusCode(500, "Server error");
             }
         }
 
-        //api/Main/SetStockLvl
+        //api/Main/SetStockLvlOfProducts
         [HttpPost()]
-        public async Task<IActionResult> SetStockLvl([Bind("ProductID, StockLvl")] Stock ObjStock)
+        public async Task<IActionResult> SetStockLvlOfProducts([Bind("ProductID, StockLvl")] ProductDto objProducts)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogInformation("The constructed object of stock is not valid.");
+                    _logger.LogInformation("Invalid construction of product object.");
                     return NoContent();
                 }
-                if (ObjStock.StockLvl < 0)
+                if (objProducts.StockLvl < 0)
                 {
-                    _logger.LogInformation($"Stock level can not be les than 0. : {ObjStock.StockLvl}");
+                    _logger.LogInformation($"Stock level of products cannot be les than 0. : {objProducts.StockLvl}");
                     return BadRequest();
                 }
-                var getStock = await Policy.Handle<Exception>().RetryAsync(2)
-                    .ExecuteAsync(async () => await _stockRepository.SetStockLvl(ObjStock.ProductID, ObjStock.StockLvl))
+                var getProducts = await Policy.Handle<Exception>().RetryAsync(2)
+                    .ExecuteAsync(async () => await _productService.SetStockLvlOfProducts(objProducts.ProductID, objProducts.StockLvl))
                     .ConfigureAwait(false);
-                if (getStock == null)
+                if (getProducts == null)
                 {
-                    _logger.LogInformation($"Stock having product ID {ObjStock.ProductID} not found.");
+                    _logger.LogInformation($"Product having product ID {objProducts.ProductID} not found.");
                     return NotFound();
                 }
-                _logger.LogInformation($" New stock level as {ObjStock.StockLvl} is set for stock with product ID {ObjStock.ProductID}");
-                return Ok(getStock);
+                _logger.LogInformation($" New stock level as {objProducts.StockLvl} is set for the product with product ID {objProducts.ProductID}");
+                return Ok(getProducts);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Stack trace: {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return StatusCode(500, "Server error");
             }
         }
-        //api/Main/GetStockResellHistory
-        public async Task<IActionResult> GetStockResellHistory(Guid productID)
+        //api/Main/GetResellHistory
+        public async Task<IActionResult> GetResellHistory(Guid productID)
         {
             try
             {
                 //Gets resell history of stock with resell price.
-                var getStock = await Policy.Handle<Exception>().RetryAsync(2)
-                    .ExecuteAsync(async () => await _stockRepository.GetResellHistory(productID))
+                var getProducts = await Policy.Handle<Exception>().RetryAsync(2)
+                    .ExecuteAsync(async () => await _productService.GetResellHistory(productID))
                     .ConfigureAwait(false);
-                if (getStock == null)
+                if (getProducts == null)
                 {
-                    _logger.LogInformation("Stock  not found");
+                    _logger.LogInformation("Product not found.");
                     return NotFound();
                 }
-                _logger.LogInformation($"Getting resell history of stock with {productID} as product ID.");
-                return Ok(getStock);
+                _logger.LogInformation($"Getting resell history of product with {productID} as product ID.");
+                return Ok(getProducts);
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Stack trace: {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return StatusCode(500, "Server error");
             }
         }
@@ -225,7 +225,7 @@ namespace Product.Controllers
                 //for intregation do:
                 //var httpToken = HttpContext.Request.Headers[" "].ToString();
                 var getCustomers = await Policy.Handle<Exception>()
-                    .RetryAsync(2).ExecuteAsync(async () => await _customerRepository.GetCustomers(/*HttpToken*/))
+                    .RetryAsync(2).ExecuteAsync(async () => await _customerService.GetCustomers(/*HttpToken*/))
                     .ConfigureAwait(false);
                 _logger.LogInformation($"Getting {getCustomers.Count} customers");
                 return Ok(getCustomers);
@@ -242,7 +242,7 @@ namespace Product.Controllers
             {
                 //Trying to get customers woth their ID.
                 var getCustomer = await Policy.Handle<Exception>().RetryAsync(2)
-                    .ExecuteAsync(async () => await _customerRepository.GetCustomerByID(customerID))
+                    .ExecuteAsync(async () => await _customerService.GetCustomerByID(customerID))
                     .ConfigureAwait(false);
                 if (getCustomer == null)
                 {
@@ -253,13 +253,13 @@ namespace Product.Controllers
                 return Ok(getCustomer);
             } catch (Exception ex)
             {
-                _logger.LogInformation($"Stack trace {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return StatusCode(500);
             }
         }
 
         //api/Main/SetPurchaseProductAbility
-        public async Task<IActionResult> SetPurchaseProductAbility ([Bind("customerID, purchaseAbility")]Customer objCustomer)
+        public async Task<IActionResult> SetPurchaseProductAbility ([Bind("customerID, purchaseAbility")]CustomerDto objCustomer)
         {
             try
             {
@@ -270,7 +270,7 @@ namespace Product.Controllers
                 }
                 //Trying to set purchase ability of customer.
                 var getCustomer = await Policy.Handle<Exception>().RetryAsync(2)
-                    .ExecuteAsync(async () => await _customerRepository.SetPurchaseProductAbility(objCustomer.CustomerID, objCustomer.PurchaseAbility))
+                    .ExecuteAsync(async () => await _customerService.SetPurchaseProductAbility(objCustomer.CustomerID, objCustomer.PurchaseAbility))
                     .ConfigureAwait(false);
                 if (getCustomer == null)
                 {
@@ -282,7 +282,7 @@ namespace Product.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Stack trace {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return StatusCode(500);
             }
         }

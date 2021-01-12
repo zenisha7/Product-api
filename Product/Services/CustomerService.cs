@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace Product.Services
 {
-    public class CustomerServices : ICustomerService
+    public class CustomerService : ICustomerService
     {
-        private readonly ILogger<CustomerServices> _logger;
-        private readonly List<Customer> _customers;
+        private readonly ILogger<CustomerService> _logger;
+        private readonly List<CustomerDto> _customers;
 
-        public CustomerServices(ILogger<CustomerServices> logger)
+        public CustomerService(ILogger<CustomerService> logger)
         {
             _customers = FakeCustomerService._customers;
             _logger = logger;
         }
 
-        public async Task<List<Customer>> GetCustomers()
+        public async Task<List<CustomerDto>> GetCustomers()
         {
             try
             {
@@ -28,11 +28,11 @@ namespace Product.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Error message: {ex.Message}\nStack trace: {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return null;
             }
         }
-        public async Task<Customer> GetCustomerByID(Guid id)
+        public async Task<CustomerDto> GetCustomerByID(Guid id)
         {
             try
             {
@@ -42,12 +42,12 @@ namespace Product.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Error message: {ex.Message}\nStack trace: {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return null;
             }
         }
 
-        public async Task<Customer> SetPurchaseProductAbility(Guid id, bool purchase)
+        public async Task<CustomerDto> SetPurchaseProductAbility(Guid id, bool purchase)
         {
             try
             {
@@ -61,7 +61,7 @@ namespace Product.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Error message: {ex.Message}\nStack trace: {ex.StackTrace}");
+                _logger.LogInformation($"Error message: {ex.Message}");
                 return null;
             }
         }

@@ -11,14 +11,14 @@ namespace Product.Tests
     public class CustomerServicesTests
     {
         private ICustomerService _customerRepo;
-        private Mock<ILogger<CustomerServices>> _logger;
+        private Mock<ILogger<CustomerService>> _logger;
 
 
         [SetUp]
         public void Setup()
         {
-            _logger = new Mock<ILogger<CustomerServices>>();
-            _customerRepo = new CustomerServices(_logger.Object);
+            _logger = new Mock<ILogger<CustomerService>>();
+            _customerRepo = new CustomerService(_logger.Object);
 
         }
 
@@ -29,7 +29,7 @@ namespace Product.Tests
             var expectedResult = FakeCustomerService._customers;
             var actualResult = await _customerRepo.GetCustomers();
             Assert.IsNotNull(actualResult);
-            Assert.IsInstanceOf<List<Customer>>(actualResult);
+            Assert.IsInstanceOf<List<CustomerDto>>(actualResult);
 
             for (int i = 0; i < actualResult.Count; i++)
             {
@@ -53,7 +53,7 @@ namespace Product.Tests
             var actualResult = await _customerRepo.GetCustomerByID(expectedResult.CustomerID);
 
             Assert.IsNotNull(actualResult);
-            Assert.IsInstanceOf<Customer>(actualResult);
+            Assert.IsInstanceOf<CustomerDto>(actualResult);
             Assert.AreEqual(expectedResult.CustomerID, actualResult.CustomerID);
             Assert.AreEqual(expectedResult.FirstName, actualResult.FirstName);
             Assert.AreEqual(expectedResult.LastName, actualResult.LastName);
@@ -73,7 +73,7 @@ namespace Product.Tests
             var actualResult = await _customerRepo.SetPurchaseProductAbility(expectedResult.CustomerID, expectedResult.PurchaseAbility);
 
             Assert.IsNotNull(actualResult);
-            Assert.IsInstanceOf<Customer>(actualResult);
+            Assert.IsInstanceOf<CustomerDto>(actualResult);
             Assert.AreEqual(expectedResult.CustomerID, actualResult.CustomerID);
             Assert.AreEqual(expectedResult.FirstName, actualResult.FirstName);
             Assert.AreEqual(expectedResult.LastName, actualResult.LastName);

@@ -2,7 +2,7 @@
 
 namespace Product.Models
 {
-    public class Customer
+    public class CustomerDto
     {
         public Guid CustomerID { get; set; }
         public string FirstName { get; set; }

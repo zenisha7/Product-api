@@ -3,7 +3,7 @@
 
 namespace Product.Models
 {
-    public class Stock
+    public class ProductDto
     {
         public Guid ID { get; set; }
         public Guid ProductID { get; set; }

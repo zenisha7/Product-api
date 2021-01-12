@@ -25,7 +25,7 @@ namespace Product.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("DateTme")
+                    b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("ProductID")
@@ -39,7 +39,7 @@ namespace Product.Migrations
                     b.ToTable("ResellHistories");
                 });
 
-            modelBuilder.Entity("Product.Models.Stock", b =>
+            modelBuilder.Entity("Product.Models.ProductDto", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
@@ -56,7 +56,7 @@ namespace Product.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Stocks");
+                    b.ToTable("Products");
                 });
 #pragma warning restore 612, 618
         }

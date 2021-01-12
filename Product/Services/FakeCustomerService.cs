@@ -8,9 +8,9 @@ namespace Product.Services
 {
     public class FakeCustomerService
     {
-        public static readonly List<Customer> _customers = new List<Customer>
+        public static readonly List<CustomerDto> _customers = new List<CustomerDto>
         {
-            new Customer {CustomerID = new Guid("d9f17828-d2d4-47a7-b9f7-f3da369ef321"),
+            new CustomerDto {CustomerID = new Guid("d9f17828-d2d4-47a7-b9f7-f3da369ef321"),
                 FirstName = "Customer",
                 LastName = "AAAAA",
                 Email = "CustomerAAA@hotmail.com",
@@ -19,7 +19,7 @@ namespace Product.Services
                 MobNumber = "1111111",
                 PurchaseAbility = true
             },
-            new Customer {CustomerID = new Guid("36004789-ebe9-47f9-a45c-6502232e5304"),
+            new CustomerDto {CustomerID = new Guid("36004789-ebe9-47f9-a45c-6502232e5304"),
                 FirstName = "Customer",
                 LastName = "BBBBB",
                 Email = "CustomerBB@hotmail.com",
@@ -28,7 +28,7 @@ namespace Product.Services
                 MobNumber = "2222222",
                 PurchaseAbility = true
             },
-            new Customer {CustomerID = new Guid("d9f17828-d2d4-47a7-b9f7-f3da369ef321"),
+            new CustomerDto {CustomerID = new Guid("d9f17828-d2d4-47a7-b9f7-f3da369ef321"),
                 FirstName = "Customer",
                 LastName = "CCCCCC",
                 Email = "CustomerCC@hotmail.com",
@@ -40,14 +40,14 @@ namespace Product.Services
             }
         };
 
-        public static Customer GetCustomerByID(Guid id)
+        public static CustomerDto GetCustomerByID(Guid id)
         {
             var getCustomer = _customers.Where(g => g.CustomerID == id).FirstOrDefault();
 
             return getCustomer;
         }
 
-        public static Customer SetPurchaseProductAbility(Guid id, bool purchaseAbility)
+        public static CustomerDto SetPurchaseProductAbility(Guid id, bool purchaseAbility)
         {
             var getCustomer = _customers.Where(g => g.CustomerID == id).FirstOrDefault();
             if (getCustomer != null)
