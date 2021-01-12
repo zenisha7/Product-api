@@ -20,6 +20,7 @@ namespace Product
             Configuration = configuration;
         }
         public IConfiguration Configuration { get; }
+       // private IHostingEnvironment Environment;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -30,15 +31,30 @@ namespace Product
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-            services.AddControllersWithViews();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddDbContext<ProductDbContext>(options =>
             {
                 var cs = Configuration.GetConnectionString("ProductDBConnection");
                 options.UseSqlServer(cs);
             });
+            
+            //if(Environment.IsDevelopment())
+            ///{   
+                //Internal services
+                services.AddScoped<IProductService, ProductService>();
+                services.AddScoped<ICustomerService, CustomerService>();
+           // }
+            //else
+            //{
+                //services.AddScoped<IProductService, ProductService>();
+                //services.AddScoped<ICustomerService, CustomerService>();
+                //services.AddHttpClient<ICustomerService, ExternalService>(g =>
+                //{
+                //    g.BaseAddress = new Uri("url token");
+                //    g.DefaultRequestHeaders.Accept.Clear();
+                //});
+           // }
 
-            services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<ICustomerService, CustomerService>();
             // Configure your policies
             services.AddAuthorization(options =>
                   options.AddPolicy("Staff",
