@@ -15,14 +15,11 @@ namespace Product
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            Environment = environment;
-
         }
         public IConfiguration Configuration { get; }
-        private IHostingEnvironment Environment;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -62,7 +59,6 @@ namespace Product
             }
             app.UseStaticFiles();
             app.UseCookiePolicy();
-            app.UseAuthentication();
             app.UseRouting();
 
             app.UseEndpoints(routes =>
