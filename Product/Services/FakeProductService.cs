@@ -86,7 +86,7 @@ namespace Product.Services
             return resellHistory;
         }
 
-        public static ProductDto SetResellPriceOfProducts(Guid productID, double resellPrice)
+        public static ProductDto SetResellPrice(Guid productID, double resellPrice)
         {
             var product = _product.Where(s => s.ProductID == productID).FirstOrDefault();
             if (product != null && resellPrice >= 0)

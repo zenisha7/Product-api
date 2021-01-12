@@ -16,8 +16,6 @@ namespace Product.Tests
         private IProductService _product;
         private Mock<ILogger<ProductService>> _logger;
         private Guid productID;
-        private int stockLvl;
-        private double resellPrice;
         private ProductDbContext GetProductDbContext()
         {
             var options = new DbContextOptionsBuilder<ProductDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
@@ -31,11 +29,8 @@ namespace Product.Tests
         {
             _logger = new Mock<ILogger<ProductService>>();
             _product = new ProductService(GetProductDbContext(), _logger.Object);
-            productID = FakeProductService._product[1].ProductID;
-            stockLvl = 30;
-            resellPrice = FakeProductService._product[1].ResellPrice;
+            productID = FakeProductService._product[2].ProductID;
         }
-
 
         #region GetAllProductsTest
         [Test]
@@ -43,7 +38,6 @@ namespace Product.Tests
         {
             var expectedResult = FakeProductService._product;
             var actualResult = await _product.GetAllProducts();
-            Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<ProductDto>>(actualResult);
             for(int i= 0; i < actualResult.Count; i++)
             {
@@ -51,36 +45,42 @@ namespace Product.Tests
                 Assert.AreEqual(expectedResult[i].ProductID, actualResult[i].ProductID);
                 Assert.AreEqual(expectedResult[i].StockLvl, actualResult[i].StockLvl);
                 Assert.AreEqual(expectedResult[i].ResellPrice, actualResult[i].ResellPrice);
-                
             }
         }
         #endregion GetAllProductsTest
 
-        #region GetStockByIDTest
-        //Test for get stock by its product ID
+        #region GetProductByProductIDTest
+        //Test for get product Valid Test
         [Test]
-        public async Task GetStockByIDTest()
+        public async Task GetProductByProductID_ValidTest()
         {
             var expectedResult = FakeProductService._product[1];
             var actualResult = await _product.GetProductByProductID(expectedResult.ProductID);
-            Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<ProductDto>(actualResult);
             Assert.AreEqual(expectedResult.ID, actualResult.ID);
             Assert.AreEqual(expectedResult.ProductID, actualResult.ProductID);
             Assert.AreEqual(expectedResult.StockLvl, actualResult.StockLvl);
             Assert.AreEqual(expectedResult.ResellPrice, actualResult.ResellPrice);
-
         }
-        #endregion GetStockByIDTest
 
-        #region GetStockByLvlTest
-        //Getting stock by stock level
         [Test]
-        public async Task GetStockByLvlTest()
+        //Test for get product invalid test returns null
+        public async Task GetProductByProductID_InvalidTest()
         {
+            var invalidProductID = Guid.NewGuid();
+            var expectedResult = FakeProductService.GetProductByProductID(invalidProductID);
+            var actualResult = await _product.GetProductByProductID(invalidProductID);
+            Assert.AreEqual(expectedResult, actualResult);
+        }
+        #endregion GetProductByProductIDTest
+
+        #region GetStockLvlOfProductTest
+        [Test]
+        public async Task GetStockLvlOfProduct_ValidTest()
+        {
+            int stockLvl = 30;
             var expectedResult = FakeProductService.GetStockLevelOfProduct(stockLvl);
             var actualResult = await _product.GetStockLvlOfProducts(stockLvl);
-            Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<ProductDto>>(actualResult);
             for(int i = 0; i < actualResult.Count; i++)
             {
@@ -88,33 +88,56 @@ namespace Product.Tests
                 Assert.AreEqual(expectedResult[i].ProductID, actualResult[i].ProductID);
                 Assert.AreEqual(expectedResult[i].ResellPrice, actualResult[i].ResellPrice);
                 Assert.AreEqual(expectedResult[i].StockLvl, actualResult[i].StockLvl);
-                
             }
         }
-        #endregion GetStockByLvlTest
+        [Test]
+        public async Task GetStockLvlOfProduct_InvalidTest()
+        {
+            //Invalid stock level test. It shouuld return empty.
+            int invalidStockLvl = -10;
+            var expectedResult = FakeProductService.GetStockLevelOfProduct(invalidStockLvl);
+            var actualResult = await _product.GetStockLvlOfProducts(invalidStockLvl);
+            Assert.IsInstanceOf<List<ProductDto>>(actualResult);
+            for (int i = 0; i < actualResult.Count; i++)
+            {
+                Assert.AreEqual(expectedResult[i].ID, actualResult[i].ID);
+                Assert.AreEqual(expectedResult[i].ProductID, actualResult[i].ProductID);
+                Assert.AreEqual(expectedResult[i].ResellPrice, actualResult[i].ResellPrice);
+                Assert.AreEqual(expectedResult[i].StockLvl, actualResult[i].StockLvl);
+            }
+        }
+
+        #endregion GetStockLvlOfProductTest
 
         #region GetResellPriceTest
-        //Test for getting the resell price of stock.
+        //Test for getting the resell price of stock returns resell price.
         [Test]
-        public async Task GetResellPriceTest()
+        public async Task GetResellPrice_ValidTest()
         {
-            var expectedResult = FakeProductService._resellPrice[1];
-            var actualResult = await _product.GetResellPriceOfProducts(expectedResult.ProductID);
-            Assert.IsNotNull(actualResult);
+            var expectedResult = FakeProductService._product[2];
+            var actualResult = await _product.GetResellPriceOfProducts(productID);
             Assert.IsInstanceOf<ResellPrice>(actualResult);
             Assert.AreEqual(expectedResult.ProductID, actualResult.ProductID);
-            Assert.AreEqual(expectedResult.ResellPrices, actualResult.ResellPrices);
+            Assert.AreEqual(expectedResult.ResellPrice, actualResult.ResellPrices);
+        }
+
+        [Test]
+        public async Task GetResellPriceTest_InvalidTest()
+        {
+            Guid invalidProductID = Guid.NewGuid();
+            var expectedResult = FakeProductService.GetResellPriceOfProducts(invalidProductID);
+            var actualResult = await _product.GetResellPriceOfProducts(invalidProductID);
+            Assert.AreEqual(expectedResult, actualResult);
         }
         #endregion GetResellPriceTest
 
         #region GetResellHistoryTest
-        //Test for getting the resell history of stock.
+        //Test for getting the resell history of products.
         [Test]
-        public async Task GetResellHistoryTest()
+        public async Task GetResellHistory_ValidTest()
         {
             var expectedResult = FakeProductService.GetResellHistory(productID);
             var actualResult = await _product.GetResellHistory(productID);
-            Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<ResellHistory>>(actualResult);
             for(int i =0; i<actualResult.Count; i++)
             {
@@ -122,26 +145,48 @@ namespace Product.Tests
                 Assert.AreEqual(expectedResult[i].ProductID, actualResult[i].ProductID);
                 Assert.AreEqual(expectedResult[i].ResellPrice, actualResult[i].ResellPrice);
                 Assert.AreEqual(expectedResult[i].DateTime, actualResult[i].DateTime);
-
             }
         }
+        [Test]
+        //Resell history test when productId is invalid, should return empty.
+        public async Task GetResellHistory_InvalidTest()
+        {
+            Guid invalidProductID = new Guid();
+            var expectedResult = FakeProductService.GetResellHistory(invalidProductID);
+            var actualResult = await _product.GetResellHistory(productID);
+            Assert.IsInstanceOf<List<ResellHistory>>(actualResult);
+            for (int i = 0; i < actualResult.Count; i++)
+            {
+                Assert.AreEqual(expectedResult[i].ID, actualResult[i].ID);
+                Assert.AreEqual(expectedResult[i].ProductID, actualResult[i].ProductID);
+                Assert.AreEqual(expectedResult[i].ResellPrice, actualResult[i].ResellPrice);
+                Assert.AreEqual(expectedResult[i].DateTime, actualResult[i].DateTime);
+            }
+        }
+
         #endregion GetResellHistoryTest
 
         #region SetStockLvlTest
-        //Test for setting the stock level of stock.
+        //Test for setting the stock level of productt.
         [Test]
-        public async Task SetStockLvlTest()
+        public async Task SetStockLvlOfProduct_ValidTest()
         {
             var expectedResult = FakeProductService._product[1];
             var actualResult = await _product.SetStockLvlOfProducts(expectedResult.ProductID, expectedResult.StockLvl);
-            Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<ProductDto>(actualResult);
             Assert.AreEqual(expectedResult.ID, actualResult.ID);
             Assert.AreEqual(expectedResult.ProductID, actualResult.ProductID);
             Assert.AreEqual(expectedResult.ResellPrice, actualResult.ResellPrice);
             Assert.AreEqual(expectedResult.StockLvl, actualResult.StockLvl);
-
         }
-# endregion SetStockLvlTest
+        public async Task SetStockLvlOfProduct_InvalidTest()
+        {
+            var invalidProductID = Guid.NewGuid();
+            int stockLvl = 50;
+            var expectedResult = FakeProductService.SetStockLevelOfProduct(invalidProductID, stockLvl);
+            var actualResult = await _product.SetStockLvlOfProducts(invalidProductID, stockLvl);
+            Assert.AreEqual(expectedResult, actualResult);
+        }
+#endregion SetStockLvlTest
     }
 }

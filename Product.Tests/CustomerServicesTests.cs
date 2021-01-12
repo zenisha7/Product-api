@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Product.Models;
 using Product.Services;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,16 +11,13 @@ namespace Product.Tests
 {
     public class CustomerServicesTests
     {
-        private ICustomerService _customerRepo;
+        private ICustomerService _customer;
         private Mock<ILogger<CustomerService>> _logger;
-
-
         [SetUp]
         public void Setup()
         {
             _logger = new Mock<ILogger<CustomerService>>();
-            _customerRepo = new CustomerService(_logger.Object);
-
+            _customer = new CustomerService(_logger.Object);
         }
 
         #region GetCustomersTest
@@ -27,10 +25,9 @@ namespace Product.Tests
         public async Task GetCustomersTest()
         {
             var expectedResult = FakeCustomerService._customers;
-            var actualResult = await _customerRepo.GetCustomers();
+            var actualResult = await _customer.GetCustomers();
             Assert.IsNotNull(actualResult);
             Assert.IsInstanceOf<List<CustomerDto>>(actualResult);
-
             for (int i = 0; i < actualResult.Count; i++)
             {
                 Assert.AreEqual(expectedResult[i].CustomerID, actualResult[i].CustomerID);
@@ -47,12 +44,11 @@ namespace Product.Tests
 
         #region GetCustomerByIDTest
         [Test]
-        public async Task GetCustomerByIDTest()
+        //Valid test should return customers
+        public async Task GetCustomerByID_ValidTest()
         {
             var expectedResult = FakeCustomerService._customers[1];
-            var actualResult = await _customerRepo.GetCustomerByID(expectedResult.CustomerID);
-
-            Assert.IsNotNull(actualResult);
+            var actualResult = await _customer.GetCustomerByID(expectedResult.CustomerID);
             Assert.IsInstanceOf<CustomerDto>(actualResult);
             Assert.AreEqual(expectedResult.CustomerID, actualResult.CustomerID);
             Assert.AreEqual(expectedResult.FirstName, actualResult.FirstName);
@@ -62,17 +58,25 @@ namespace Product.Tests
             Assert.AreEqual(expectedResult.Email, actualResult.Email);
             Assert.AreEqual(expectedResult.MobNumber, actualResult.MobNumber);
             Assert.AreEqual(expectedResult.PurchaseAbility, actualResult.PurchaseAbility);
+        }
+        [Test]
+        public async Task GetCustomerByID_InvalidTest()
+        {
+            Guid invalidID = new Guid();
+            var expectedResult = FakeCustomerService.GetCustomerByID(invalidID);
+            var actualResult = await _customer.GetCustomerByID(invalidID);
+            Assert.AreEqual(expectedResult, actualResult);
         }
         #endregion GetCustomerByIDTest
 
         #region SetPurchaseProductAbilityTest
         [Test]
-        public async Task SetPurchaseProductAbilityTest()
+        //Valid test should return customers
+        public async Task SetPurchaseProductAbility_ValidTest()
         {
+            
             var expectedResult = FakeCustomerService._customers[1];
-            var actualResult = await _customerRepo.SetPurchaseProductAbility(expectedResult.CustomerID, expectedResult.PurchaseAbility);
-
-            Assert.IsNotNull(actualResult);
+            var actualResult = await _customer.SetPurchaseProductAbility(expectedResult.CustomerID, expectedResult.PurchaseAbility);
             Assert.IsInstanceOf<CustomerDto>(actualResult);
             Assert.AreEqual(expectedResult.CustomerID, actualResult.CustomerID);
             Assert.AreEqual(expectedResult.FirstName, actualResult.FirstName);
@@ -83,7 +87,15 @@ namespace Product.Tests
             Assert.AreEqual(expectedResult.MobNumber, actualResult.MobNumber);
             Assert.AreEqual(expectedResult.PurchaseAbility, actualResult.PurchaseAbility);
         }
+        [Test]
+        //invalid test should return null
+        public async Task SetPurchaseProductAbility_InvalidTest()
+        {
+            Guid invalidID = new Guid();
+            var expectedResult = FakeCustomerService.SetPurchaseProductAbility(invalidID, true);
+            var actualResult = await _customer.SetPurchaseProductAbility(invalidID, true);
+            Assert.AreEqual(expectedResult, actualResult);
+        }
         #endregion SetPurchaseProductAbilityTest
-
     }
 }
